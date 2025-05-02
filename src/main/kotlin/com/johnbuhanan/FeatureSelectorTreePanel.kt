@@ -28,7 +28,8 @@ class FeatureSelectorTreePanel : JPanel() {
     init {
         UIManager.put("Tree.paintLines", true)
         tree.ui = BasicTreeUI()
-        expandAllRows()
+//        expandAllRows()
+        tree.expandRow(0)
     }
 
     private fun expandAllRows() {
@@ -40,28 +41,56 @@ class FeatureSelectorTreePanel : JPanel() {
             }
         }
     }
+}
 
-    private fun createNodesAndGetRoot(): DefaultMutableTreeNode {
-        return DefaultMutableTreeNode(NodeData("Home", NodeType.FEATURE)).apply {
-            add(DefaultMutableTreeNode(NodeData("Dashboard", NodeType.FEATURE)).apply {
-                add(DefaultMutableTreeNode(NodeData("AuthLib", NodeType.LIBRARY)))
-                add(DefaultMutableTreeNode(NodeData("Profile", NodeType.FEATURE)).apply {
-                    add(DefaultMutableTreeNode(NodeData("EditProfile", NodeType.FEATURE)).apply {
-                        add(DefaultMutableTreeNode(NodeData("ImageLib", NodeType.LIBRARY)))
-                    })
-                    add(DefaultMutableTreeNode(NodeData("Settings", NodeType.FEATURE)).apply {
-                        add(DefaultMutableTreeNode(NodeData("AnalyticsLib", NodeType.LIBRARY)).apply {
-                            userObject = NodeData("AnalyticsLib", NodeType.LIBRARY)
-                        })
-                    })
-                })
-            })
-            add(DefaultMutableTreeNode(NodeData("Music", NodeType.FEATURE)).apply {
-                add(DefaultMutableTreeNode(NodeData("AudioLib", NodeType.LIBRARY)))
-                add(DefaultMutableTreeNode(NodeData("Player", NodeType.FEATURE)).apply {
-                    add(DefaultMutableTreeNode(NodeData("StorageLib", NodeType.LIBRARY)))
-                })
-            })
+
+// :feature:home:internal -> :feature:detail:public
+// :feature:home:internal -> :library:home:public
+// :feature:detail:internal -> :feature:nowplaying:public
+// :feature:detail:internal -> :library:detail:public
+// :feature:nowplaying:internal -> n/a
+// :feature:premium:internal -> :library:premium:public
+// :feature:search:internal -> :library:search:public
+
+private fun createNodesAndGetRoot(): DefaultMutableTreeNode {
+    return DefaultMutableTreeNode(NodeData("app", NodeType.FEATURE)).apply {
+        addHomeTree()
+        addDetailTree()
+        feature("nowplaying")
+        feature("premium").apply {
+            library("premium")
         }
+        addSearchTree()
     }
 }
+
+private fun DefaultMutableTreeNode.addHomeTree() {
+    feature("home").apply {
+        addDetailTree()
+        library("home")
+    }
+}
+
+private fun DefaultMutableTreeNode.addDetailTree() {
+    feature("detail").apply {
+        feature("nowplaying")
+        library("detail")
+    }
+}
+
+private fun DefaultMutableTreeNode.addSearchTree() {
+    feature("search").apply {
+        library("search")
+    }
+}
+
+private fun DefaultMutableTreeNode.feature(moduleName: String): DefaultMutableTreeNode {
+    return add(moduleName, NodeType.FEATURE)
+}
+
+private fun DefaultMutableTreeNode.library(moduleName: String): DefaultMutableTreeNode {
+    return add(moduleName, NodeType.LIBRARY)
+}
+
+private fun DefaultMutableTreeNode.add(moduleName: String, nodeType: NodeType): DefaultMutableTreeNode =
+    DefaultMutableTreeNode(NodeData(moduleName, nodeType)).also { add(it) }

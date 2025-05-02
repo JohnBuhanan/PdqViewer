@@ -10,7 +10,7 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val panel = FeatureSelectorTreePanel()
 
-        @Suppress("DEPRECATION", "removal")
+        @Suppress("removal")
         val contentFactory = ContentFactory.SERVICE.getInstance()
         val content = contentFactory.createContent(panel, "", false)
         toolWindow.contentManager.addContent(content)
