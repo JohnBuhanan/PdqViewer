@@ -1,4 +1,4 @@
-package johnbuhanan
+package com.johnbuhanan
 
 import com.intellij.ui.treeStructure.Tree
 import java.awt.BorderLayout

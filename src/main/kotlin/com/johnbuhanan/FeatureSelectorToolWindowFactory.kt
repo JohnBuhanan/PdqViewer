@@ -1,4 +1,4 @@
-package johnbuhanan
+package com.johnbuhanan
 
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project

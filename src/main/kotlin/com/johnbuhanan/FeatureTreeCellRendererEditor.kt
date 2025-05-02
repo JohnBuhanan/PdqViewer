@@ -1,4 +1,4 @@
-package johnbuhanan
+package com.johnbuhanan
 
 import java.awt.Component
 import java.awt.FlowLayout

@@ -1,4 +1,4 @@
-package johnbuhanan
+package com.johnbuhanan
 
 internal class NodeData(var name: String?, var type: NodeType?) {
     var selected: Boolean = true
