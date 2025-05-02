@@ -7,12 +7,13 @@ package com.johnbuhanan
 import com.intellij.ui.Gray
 import com.intellij.ui.JBColor
 import java.awt.*
+import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
 
 class SwitchButtonA : JComponent() {
-    private var isSelected: Boolean = true
+    var isSelected: Boolean = true
     private var slidePosition = 0
 
     init {
@@ -20,12 +21,16 @@ class SwitchButtonA : JComponent() {
             override fun mouseClicked(evt: MouseEvent?) {
                 toggle()
                 if (isSelected) {
-                    setBackground(JBColor.DARK_GRAY)
-                } else {
                     setBackground(JBColor.WHITE)
+                } else {
+                    setBackground(JBColor.DARK_GRAY)
                 }
             }
         })
+    }
+
+    fun addActionListener(l: ActionListener) {
+        listenerList.add(ActionListener::class.java, l)
     }
 
     fun toggle() {
@@ -48,6 +53,10 @@ class SwitchButtonA : JComponent() {
         }
     }
 
+    override fun getPreferredSize(): Dimension {
+        return Dimension(40, 16) // Width can be flexible; height controls the vertical size
+    }
+
     @Suppress("UseJBColor")
     override fun paintComponent(g: Graphics?) {
         super.paintComponent(g)
@@ -62,17 +71,18 @@ class SwitchButtonA : JComponent() {
 
         // Draw the sliding button
         if (this.isSelected) {
-            g2d.color = Color.black
-        } else {
             g2d.color = Color.WHITE
+        } else {
+            g2d.color = Color.black
         }
+
         g2d.fillOval(slidePosition, 0, getHeight(), getHeight())
 
         // Draw the text ("ON" or "OFF")
         g2d.color = if (isSelected) Color.WHITE else Color.BLACK
         val font = Font("Arial", Font.BOLD, 12)
         g2d.font = font
-        val text = if (isSelected) "noonlight" else "fake"
+        val text = if (isSelected) "" else "fake"
 
         val textWidth = g2d.fontMetrics.stringWidth(text)
         val x = (getWidth() - textWidth) / 2
