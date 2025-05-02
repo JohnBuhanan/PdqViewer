@@ -37,5 +37,13 @@
         <toolWindow id="Sample Calendar" secondary="true" icon="AllIcons.Toolwindows.WebToolWindow" anchor="right"
                     factoryClass="com.johnbuhanan.CalendarToolWindowFactory"/>
     </extensions>
+    <actions>
+        <action id="SelectFeaturesAction"
+                class="com.johnbuhanan.SelectFeaturesAction"
+                text="Select Features"
+                description="Opens the Select Features dialog">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
 
 </idea-plugin>
