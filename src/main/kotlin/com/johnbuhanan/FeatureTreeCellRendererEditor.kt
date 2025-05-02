@@ -75,7 +75,7 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
 ////        isBorderPainted = false
 ////        isContentAreaFilled = false
 ////        text = ""
-        preferredSize = Dimension(40, 20)
+        preferredSize = Dimension(80, 20)
 //
 //        addChangeListener {
 //            if (isSelected) {
