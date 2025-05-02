@@ -10,15 +10,12 @@ import javax.swing.tree.DefaultMutableTreeNode
 class FeatureSelectorTreePanel : JPanel() {
     private val tree by lazy {
         layout = BorderLayout()
-
-        val tree = Tree(createNodesAndGetRoot()).apply {
+        Tree(createNodesAndGetRoot()).apply {
             cellRenderer = FeatureTreeCellRenderer()
             rowHeight = 24
+        }.also {
+            add(JScrollPane(it), BorderLayout.CENTER)
         }
-
-        add(JScrollPane(tree), BorderLayout.CENTER)
-
-        tree
     }
 
     init {
