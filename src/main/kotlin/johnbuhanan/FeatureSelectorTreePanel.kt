@@ -19,7 +19,10 @@ class FeatureSelectorTreePanel : JPanel() {
     }
 
     init {
-        // Expand all rows after rendering
+        expandAllRows()
+    }
+
+    private fun expandAllRows() {
         SwingUtilities.invokeLater {
             var i = 0
             while (i < tree.rowCount) {
