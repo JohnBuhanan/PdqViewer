@@ -2,25 +2,32 @@ package johnbuhanan
 
 import com.intellij.ui.treeStructure.Tree
 import java.awt.BorderLayout
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.SwingUtilities
+import java.awt.Dimension
+import javax.swing.*
+import javax.swing.plaf.basic.BasicTreeUI
 import javax.swing.tree.DefaultMutableTreeNode
 
 class FeatureSelectorTreePanel : JPanel() {
     private val tree by lazy {
         layout = BorderLayout()
+        val buttonHeight = JToggleButton().preferredSize.height
+        preferredSize = Dimension(200, buttonHeight) // adjust width as needed
         Tree(createNodesAndGetRoot()).apply {
-            rowHeight = 24
             cellRenderer = FeatureTreeCellRendererEditor()
             cellEditor = FeatureTreeCellRendererEditor()
             isEditable = true
+            setShowsRootHandles(true)
+            isRootVisible = true
+            putClientProperty("JTree.lineStyle", "Angled")
+            rowHeight = buttonHeight
         }.also {
             add(JScrollPane(it), BorderLayout.CENTER)
         }
     }
 
     init {
+        UIManager.put("Tree.paintLines", true)
+        tree.ui = BasicTreeUI()
         expandAllRows()
     }
 
