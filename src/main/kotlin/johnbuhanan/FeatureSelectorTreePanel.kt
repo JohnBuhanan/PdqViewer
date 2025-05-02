@@ -11,8 +11,10 @@ class FeatureSelectorTreePanel : JPanel() {
     private val tree by lazy {
         layout = BorderLayout()
         Tree(createNodesAndGetRoot()).apply {
-            cellRenderer = FeatureTreeCellRenderer()
             rowHeight = 24
+            cellRenderer = FeatureTreeCellRendererEditor()
+            cellEditor = FeatureTreeCellRendererEditor()
+            isEditable = true
         }.also {
             add(JScrollPane(it), BorderLayout.CENTER)
         }
