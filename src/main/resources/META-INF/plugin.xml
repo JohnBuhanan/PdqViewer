@@ -34,16 +34,10 @@
     <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Sample Calendar" secondary="true" icon="AllIcons.Toolwindows.WebToolWindow" anchor="right"
-                    factoryClass="com.johnbuhanan.CalendarToolWindowFactory"/>
+        <toolWindow id="FeatureSelector"
+                    anchor="right"
+                    icon="AllIcons.Toolwindows.ToolWindowStructure"
+                    factoryClass="com.johnbuhanan.FeatureSelectorToolWindowFactory"
+                    secondary="false"/>
     </extensions>
-    <actions>
-        <action id="SelectFeaturesAction"
-                class="com.johnbuhanan.SelectFeaturesAction"
-                text="Select Features"
-                description="Opens the Select Features dialog">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-    </actions>
-
 </idea-plugin>
