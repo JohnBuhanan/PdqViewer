@@ -1,40 +1,44 @@
-package com.johnbuhanan;
+package johnbuhanan
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
-import java.awt.*;
+import java.awt.Component
+import java.awt.FlowLayout
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import javax.swing.*
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.TreeCellRenderer
 
-class FeatureTreeCellRenderer extends JPanel implements TreeCellRenderer {
-    JCheckBox checkBox = new JCheckBox();
-    JLabel label = new JLabel();
-    JToggleButton toggle = new JToggleButton("Real");
+internal class FeatureTreeCellRenderer : JPanel(), TreeCellRenderer {
+    var checkBox: JCheckBox = JCheckBox()
+    var label: JLabel = JLabel()
+    var toggle: JToggleButton = JToggleButton("Real")
 
-    public FeatureTreeCellRenderer() {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        toggle.addActionListener(e -> toggle.setText(toggle.isSelected() ? "Fake" : "Real"));
+    init {
+        setLayout(FlowLayout(FlowLayout.LEFT, 5, 0))
+        toggle.addActionListener(ActionListener { e: ActionEvent? -> toggle.setText(if (toggle.isSelected) "Fake" else "Real") })
     }
 
-    public Component getTreeCellRendererComponent(JTree tree, Object value,
-                                                  boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-
-        removeAll();
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-        NodeData data = (NodeData) node.getUserObject();
+    override fun getTreeCellRendererComponent(
+        tree: JTree?, value: Any?,
+        selected: Boolean, expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean
+    ): Component {
+        removeAll()
+        val node = value as DefaultMutableTreeNode
+        val data = node.getUserObject() as NodeData
 
         if (data.type == NodeType.FEATURE) {
-            checkBox.setText(data.name);
-            checkBox.setSelected(data.selected);
-            add(checkBox);
+            checkBox.setText(data.name)
+            checkBox.setSelected(data.selected)
+            add(checkBox)
         } else if (data.type == NodeType.LIBRARY) {
-            label.setText(data.name);
-            toggle.setEnabled(data.hasFake);
-            toggle.setSelected(data.useFake);
-            toggle.setText(data.useFake ? "Fake" : "Real");
-            add(label);
-            add(toggle);
+            label.setText(data.name)
+            toggle.setEnabled(data.hasFake)
+            toggle.setSelected(data.useFake)
+            toggle.setText(if (data.useFake) "Fake" else "Real")
+            add(label)
+            add(toggle)
         }
 
-        return this;
+        return this
     }
 }

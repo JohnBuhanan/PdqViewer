@@ -3,6 +3,7 @@
 plugins {
     id("java")
     id("org.jetbrains.intellij.platform") version "2.5.0"
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 group = "com.johnbuhanan"
@@ -20,6 +21,7 @@ dependencies {
     intellijPlatform {
         intellijIdeaCommunity("2024.2.6")
     }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 intellijPlatform {
@@ -30,9 +32,12 @@ intellijPlatform {
             sinceBuild = "242"
         }
     }
-    pluginVerification  {
+    pluginVerification {
         ides {
             recommended()
         }
     }
+}
+kotlin {
+    jvmToolchain(21)
 }

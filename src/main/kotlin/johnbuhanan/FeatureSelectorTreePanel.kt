@@ -1,48 +1,58 @@
-package com.johnbuhanan;
+package johnbuhanan
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
+import com.intellij.ui.treeStructure.Tree
+import java.awt.BorderLayout
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.SwingUtilities
+import javax.swing.tree.DefaultMutableTreeNode
 
-enum NodeType {FEATURE, LIBRARY}
+class FeatureSelectorTreePanel : JPanel() {
+    private val tree by lazy {
+        layout = BorderLayout()
 
-class NodeData {
-    String name;
-    NodeType type;
-    boolean selected = true;
-    boolean hasFake = true;  // only applies to libraries
-    boolean useFake = false; // only applies to libraries
+        val tree = Tree(createNodesAndGetRoot()).apply {
+            cellRenderer = FeatureTreeCellRenderer()
+            rowHeight = 24
+        }
 
-    public NodeData(String name, NodeType type) {
-        this.name = name;
-        this.type = type;
+        add(JScrollPane(tree), BorderLayout.CENTER)
+
+        tree
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-}
-
-public class FeatureSelectorTreePanel extends JPanel {
-
-    public FeatureSelectorTreePanel() {
-        setLayout(new BorderLayout());
-
-        // Sample tree node data
-        DefaultMutableTreeNode root = buildTreeModel();
-
-        JTree tree = new JTree(root);
-        tree.setCellRenderer(new FeatureTreeCellRenderer());
-        tree.setRowHeight(24);
-
-        JScrollPane scrollPane = new JScrollPane(tree);
-        add(scrollPane, BorderLayout.CENTER);
+    init {
+        // Expand all rows after rendering
+        SwingUtilities.invokeLater {
+            var i = 0
+            while (i < tree.rowCount) {
+                tree.expandRow(i)
+                i++
+            }
+        }
     }
 
-    private DefaultMutableTreeNode buildTreeModel() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(new NodeData("Home", NodeType.FEATURE));
-        // Build your full tree here (as in previous examples)
-        return root;
+    private fun createNodesAndGetRoot(): DefaultMutableTreeNode {
+        return DefaultMutableTreeNode(NodeData("Home", NodeType.FEATURE)).apply {
+            add(DefaultMutableTreeNode(NodeData("Dashboard", NodeType.FEATURE)).apply {
+                add(DefaultMutableTreeNode(NodeData("AuthLib", NodeType.LIBRARY)))
+                add(DefaultMutableTreeNode(NodeData("Profile", NodeType.FEATURE)).apply {
+                    add(DefaultMutableTreeNode(NodeData("EditProfile", NodeType.FEATURE)).apply {
+                        add(DefaultMutableTreeNode(NodeData("ImageLib", NodeType.LIBRARY)))
+                    })
+                    add(DefaultMutableTreeNode(NodeData("Settings", NodeType.FEATURE)).apply {
+                        add(DefaultMutableTreeNode(NodeData("AnalyticsLib", NodeType.LIBRARY)).apply {
+                            userObject = NodeData("AnalyticsLib", NodeType.LIBRARY)
+                        })
+                    })
+                })
+            })
+            add(DefaultMutableTreeNode(NodeData("Music", NodeType.FEATURE)).apply {
+                add(DefaultMutableTreeNode(NodeData("AudioLib", NodeType.LIBRARY)))
+                add(DefaultMutableTreeNode(NodeData("Player", NodeType.FEATURE)).apply {
+                    add(DefaultMutableTreeNode(NodeData("StorageLib", NodeType.LIBRARY)))
+                })
+            })
+        }
     }
 }
