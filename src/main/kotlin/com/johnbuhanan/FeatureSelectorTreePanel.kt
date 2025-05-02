@@ -30,6 +30,7 @@ class FeatureSelectorTreePanel : JPanel() {
         tree.ui = BasicTreeUI()
 //        expandAllRows()
         tree.expandRow(0)
+        tree.expandRow(1)
     }
 
     private fun expandAllRows() {

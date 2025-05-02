@@ -1,8 +1,12 @@
 package com.johnbuhanan
 
 import java.awt.Component
+import java.awt.Dimension
 import java.awt.FlowLayout
-import javax.swing.*
+import javax.swing.AbstractCellEditor
+import javax.swing.JCheckBox
+import javax.swing.JPanel
+import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeCellEditor
 import javax.swing.tree.TreeCellRenderer
@@ -10,17 +14,16 @@ import javax.swing.tree.TreeCellRenderer
 internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRenderer, TreeCellEditor {
     private val panel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0))
     private val checkBox = JCheckBox()
-    private val label = JLabel()
-    private val toggle = JToggleButton("Real")
+    private val toggle = SwitchButtonA()
 
     private var currentData: NodeData? = null
 
     init {
-        toggle.addActionListener {
-            currentData?.useFake = toggle.isSelected
-            toggle.text = if (toggle.isSelected) "Fake" else "Real"
-            fireEditingStopped()
-        }
+//        toggle.addActionListener {
+//            currentData?.useFake = toggle.isSelected
+//            toggle.text = if (toggle.isSelected) "Fake" else "Real"
+//            fireEditingStopped()
+//        }
         checkBox.addActionListener {
             currentData?.selected = checkBox.isSelected
             fireEditingStopped()
@@ -52,14 +55,34 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
             checkBox.isSelected = data.selected
             panel.add(checkBox)
         } else if (data.type == NodeType.LIBRARY) {
-            label.text = data.name
-            toggle.isEnabled = data.hasFake
-            toggle.isSelected = data.useFake
-            toggle.text = if (data.useFake) "Fake" else "Real"
-            panel.add(label)
+            toggle.update(data)
             panel.add(toggle)
         }
 
         return panel
+    }
+
+    @Suppress("UseJBColor")
+    private fun SwitchButtonA.update(nodeData: NodeData) {
+//        text = nodeData.name
+//        isSelected = nodeData.useFake
+//        isEnabled = nodeData.hasFake
+////        background = if (isSelected) Color(0xFFF59D) else Color(0xAED581)
+//        foreground = Color.BLACK
+////        border = LineBorder(Color.GRAY)
+//
+////        isFocusPainted = false
+////        isBorderPainted = false
+////        isContentAreaFilled = false
+////        text = ""
+        preferredSize = Dimension(40, 20)
+//
+//        addChangeListener {
+//            if (isSelected) {
+//                background = Color(0x4CAF50) // green
+//            } else {
+//                background = Color(0xBDBDBD) // gray
+//            }
+//        }
     }
 }
