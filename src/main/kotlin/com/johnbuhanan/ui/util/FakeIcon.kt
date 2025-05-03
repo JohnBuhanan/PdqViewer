@@ -1,4 +1,4 @@
-package com.johnbuhanan.util
+package com.johnbuhanan.ui.util
 
 import java.awt.Color
 import java.awt.Image

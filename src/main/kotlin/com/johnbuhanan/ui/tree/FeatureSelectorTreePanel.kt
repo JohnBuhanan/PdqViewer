@@ -1,9 +1,10 @@
-package com.johnbuhanan
+package com.johnbuhanan.ui.tree
 
 import com.intellij.ui.treeStructure.Tree
-import com.johnbuhanan.model.Project
-import com.johnbuhanan.model.addProject
-import com.johnbuhanan.model.toTreeNode
+import com.johnbuhanan.ui.tree.FeatureTreeCellRendererEditor
+import com.johnbuhanan.ui.model.Project
+import com.johnbuhanan.ui.model.addProject
+import com.johnbuhanan.ui.model.toTreeNode
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import javax.swing.JScrollPane

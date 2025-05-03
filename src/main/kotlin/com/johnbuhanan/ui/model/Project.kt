@@ -1,4 +1,4 @@
-package com.johnbuhanan.model
+package com.johnbuhanan.ui.model
 
 sealed class Project {
     abstract val projectPath: String

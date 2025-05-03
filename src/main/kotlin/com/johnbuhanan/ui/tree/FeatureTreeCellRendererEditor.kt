@@ -1,16 +1,14 @@
-package com.johnbuhanan
-
+package com.johnbuhanan.ui.tree
 
 import com.intellij.icons.AllIcons
-import com.johnbuhanan.model.Project
-import com.johnbuhanan.util.getFakeIcon
+import com.johnbuhanan.ui.model.Project
+import com.johnbuhanan.ui.util.getFakeIcon
 import java.awt.Component
 import java.awt.FlowLayout
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeCellEditor
 import javax.swing.tree.TreeCellRenderer
-
 
 internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRenderer, TreeCellEditor {
     private val panel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0))
@@ -68,9 +66,12 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
             }
 
             is Project.AppProject, is Project.FeatureProject -> {
-                checkBox.text = project.displayName
+//                val iconLabel = JLabel(AllIcons.Nodes.Module)
+                val nameLabel = JLabel(project.displayName)
                 checkBox.isSelected = project.isSelected
                 panel.add(checkBox)
+//                panel.add(iconLabel)
+                panel.add(nameLabel)
             }
         }
 

@@ -37,7 +37,7 @@
         <toolWindow id="FeatureSelector"
                     anchor="right"
                     icon="AllIcons.Toolwindows.ToolWindowStructure"
-                    factoryClass="com.johnbuhanan.FeatureSelectorToolWindowFactory"
+                    factoryClass="com.johnbuhanan.ui.FeatureSelectorToolWindowFactory"
                     secondary="false"/>
     </extensions>
 </idea-plugin>

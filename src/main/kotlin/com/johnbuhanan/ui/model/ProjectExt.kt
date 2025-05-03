@@ -1,6 +1,6 @@
-package com.johnbuhanan.model
+package com.johnbuhanan.ui.model
 
-import com.johnbuhanan.model.Project.*
+import com.johnbuhanan.ui.model.Project.*
 import javax.swing.tree.DefaultMutableTreeNode
 
 val allProjects = mutableMapOf<String, Project>()
