@@ -2,6 +2,8 @@ package com.johnbuhanan
 
 
 import com.intellij.icons.AllIcons
+import com.johnbuhanan.model.Project
+import com.johnbuhanan.model.toFakeLibrary
 import java.awt.Color
 import java.awt.Component
 import java.awt.FlowLayout
@@ -19,19 +21,15 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
     private val panel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0))
     private val checkBox = JCheckBox()
     private val radioButton = JRadioButton()
-//        .apply {
-//        preferredSize = Dimension(40, 10)
-//    }
-
-    private var currentData: Node? = null
+    private var currentProject: Project? = null
 
     init {
         checkBox.addActionListener {
-            currentData?.isSelected = checkBox.isSelected
+            currentProject?.isSelected = checkBox.isSelected
             fireEditingStopped()
         }
         radioButton.addActionListener {
-            currentData?.isSelected = checkBox.isSelected
+            currentProject?.isSelected = checkBox.isSelected
             fireEditingStopped()
         }
     }
@@ -48,35 +46,35 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
         return buildComponent(value)
     }
 
-    override fun getCellEditorValue(): Any? = currentData
+    override fun getCellEditorValue(): Any? = currentProject
 
     private fun buildComponent(value: Any?): JPanel {
         panel.removeAll()
         val treeNode = value as? DefaultMutableTreeNode ?: return panel
-        val node = treeNode.userObject as? Node ?: return panel
-        currentData = node
+        val node = treeNode.userObject as? Project ?: return panel
+        currentProject = node
 
         when (node) {
-            is Node.LibraryNode -> {
+            is Project.LibraryProject -> {
                 radioButton.isSelected = node.isSelected
-
                 val iconLabel = JLabel(AllIcons.Nodes.Library)
-                val nameLabel = JLabel(node.name)
+                val nameLabel = JLabel(node.projectPath)
                 panel.add(radioButton)
                 panel.add(iconLabel)
                 panel.add(nameLabel)
             }
 
-            is Node.FakeLibraryNode -> {
+            is Project.FakeLibraryProject -> {
                 radioButton.isSelected = node.isSelected
-                radioButton.text = node.name
                 val iconLabel = JLabel(getRedIcon("/toolWindow/fake.png"))
+                val nameLabel = JLabel(node.projectPath.toFakeLibrary())
                 panel.add(radioButton)
                 panel.add(iconLabel)
+                panel.add(nameLabel)
             }
 
-            is Node.RootNode, is Node.FeatureNode -> {
-                checkBox.text = node.name
+            is Project.AppProject, is Project.FeatureProject -> {
+                checkBox.text = node.projectPath
                 checkBox.isSelected = node.isSelected
                 panel.add(checkBox)
             }

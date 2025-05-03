@@ -1,18 +1,22 @@
 package com.johnbuhanan
 
 import com.intellij.ui.treeStructure.Tree
+import com.johnbuhanan.model.Project
+import com.johnbuhanan.model.addProject
+import com.johnbuhanan.model.toTreeNode
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.plaf.basic.BasicTreeUI
-import javax.swing.tree.DefaultMutableTreeNode
 
 class FeatureSelectorTreePanel : JPanel() {
     private val tree by lazy {
         layout = BorderLayout()
-        Tree(createNodesAndGetRoot()).apply {
+        val rootProject = createProjects()
+        val rootTreeNode = rootProject.toTreeNode()
+        Tree(rootTreeNode).apply {
             cellRenderer = FeatureTreeCellRendererEditor()
             cellEditor = FeatureTreeCellRendererEditor()
             isEditable = true
@@ -43,7 +47,6 @@ class FeatureSelectorTreePanel : JPanel() {
     }
 }
 
-
 // :feature:home:internal -> :feature:detail:public
 // :feature:home:internal -> :library:home:public
 // :feature:detail:internal -> :feature:nowplaying:public
@@ -51,82 +54,34 @@ class FeatureSelectorTreePanel : JPanel() {
 // :feature:nowplaying:internal -> n/a
 // :feature:premium:internal -> :library:premium:public
 // :feature:search:internal -> :library:search:public
-private fun createNodesAndGetRoot(): DefaultMutableTreeNode {
-    return DefaultMutableTreeNode(Node.RootNode(":app")).apply {
-        addHomeTree()
-        addDetailTree()
-        node(":feature:nowplaying:internal")
-        node(":feature:premium:internal").apply {
-            node(":library:premium:public")
+private fun createProjects(): Project {
+    return Project.AppProject(":app").apply {
+        addHomeProject()
+        addDetailProject()
+        addProject(":feature:nowplaying:internal")
+        addProject(":feature:premium:internal").apply {
+            addProject(":library:premium:public")
         }
-        addSearchTree()
+        addSearchProject()
     }
 }
 
-private fun DefaultMutableTreeNode.addHomeTree() {
-    node(":feature:home:internal").apply {
-        addDetailTree()
-        node(":library:home:public")
+private fun Project.addHomeProject() {
+    addProject(":feature:home:internal").apply {
+        addDetailProject()
+        addProject(":library:home:public")
     }
 }
 
-private fun DefaultMutableTreeNode.addDetailTree() {
-    node(":feature:detail:internal").apply {
-        node(":feature:nowplaying:public")
-        node(":library:detail:public")
+private fun Project.addDetailProject() {
+    addProject(":feature:detail:internal").apply {
+        addProject(":feature:nowplaying:public")
+        addProject(":library:detail:public")
     }
 }
 
-private fun DefaultMutableTreeNode.addSearchTree() {
-    node(":feature:search:internal").apply {
-        node(":library:search:public")
+private fun Project.addSearchProject() {
+    addProject(":feature:search:internal").apply {
+        addProject(":library:search:public")
     }
-}
-
-// :library:foo:public
-private fun isLibrary(moduleName: String): Boolean {
-    return moduleName.startsWith(":library") && moduleName.endsWith(":public")
-}
-
-// :feature:foo:internal
-// :feature:foo:public
-private fun isFeature(moduleName: String): Boolean {
-    return moduleName.startsWith(":feature") &&
-            (moduleName.endsWith(":public") || moduleName.endsWith(":internal"))
-}
-
-private fun DefaultMutableTreeNode.node(moduleName: String): DefaultMutableTreeNode {
-    val node = allNodes.getOrPut(moduleName) {
-        when {
-            isLibrary(moduleName) -> Node.LibraryNode(moduleName)
-            isFeature(moduleName) -> Node.FeatureNode(moduleName)
-            else -> throw IllegalStateException("Module name $moduleName not found")
-        }
-    }
-
-    return add(node)
-}
-
-private val allNodes = mutableMapOf<String, Node>()
-private fun DefaultMutableTreeNode.add(node: Node): DefaultMutableTreeNode {
-    return DefaultMutableTreeNode(node).also {
-        add(it)
-        addFakeIfNeeded(node.name)
-    }
-}
-
-// What do we do for...
-// :library:foo:public -> :library:foo:fake // We can't be guaranteed that a fake exists unless we check.
-private fun DefaultMutableTreeNode.addFakeIfNeeded(nodeName: String) {
-    val regex = Regex(""":library:([^:]+):fake""")
-    val match = regex.find(nodeName)
-    if (match == null) {
-        return
-    }
-    add(
-        Node.FakeLibraryNode(
-            name = match.groupValues[1],
-            isSelected = false,
-        )
-    )
 }
