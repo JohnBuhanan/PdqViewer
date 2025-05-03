@@ -1,7 +1,7 @@
 package com.johnbuhanan.ui.tree
 
 import com.intellij.ui.treeStructure.Tree
-import com.johnbuhanan.ui.tree.FeatureTreeCellRendererEditor
+import com.johnbuhanan.pdq.graph.model.GradleProjectGraph
 import com.johnbuhanan.ui.model.Project
 import com.johnbuhanan.ui.model.addProject
 import com.johnbuhanan.ui.model.toTreeNode
@@ -12,7 +12,9 @@ import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.plaf.basic.BasicTreeUI
 
-class FeatureSelectorTreePanel : JPanel() {
+class FeatureSelectorTreePanel(
+    private val gradleProjectGraph: GradleProjectGraph,
+) : JPanel() {
     private val tree by lazy {
         layout = BorderLayout()
         val rootProject = createProjects()
