@@ -1,7 +1,7 @@
 package com.johnbuhanan.ui.tree
 
 import com.intellij.icons.AllIcons
-import com.johnbuhanan.ui.model.Project
+import com.johnbuhanan.model.Project
 import com.johnbuhanan.ui.util.getFakeIcon
 import java.awt.Component
 import java.awt.FlowLayout
@@ -65,7 +65,7 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
                 updateLibrary(project, getFakeIcon())
             }
 
-            is Project.AppProject, is Project.FeatureProject -> {
+            is Project.RootProject, is Project.FeatureProject -> {
 //                val iconLabel = JLabel(AllIcons.Nodes.Module)
                 val nameLabel = JLabel(project.displayName)
                 checkBox.isSelected = project.isSelected
@@ -73,6 +73,9 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
 //                panel.add(iconLabel)
                 panel.add(nameLabel)
             }
+
+            is Project.AppProject -> TODO()
+            is Project.SharedTestProject -> TODO()
         }
 
         return panel
