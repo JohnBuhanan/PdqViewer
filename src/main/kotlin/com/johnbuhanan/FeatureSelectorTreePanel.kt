@@ -51,46 +51,82 @@ class FeatureSelectorTreePanel : JPanel() {
 // :feature:nowplaying:internal -> n/a
 // :feature:premium:internal -> :library:premium:public
 // :feature:search:internal -> :library:search:public
-
 private fun createNodesAndGetRoot(): DefaultMutableTreeNode {
-    return DefaultMutableTreeNode(NodeData("app", NodeType.FEATURE)).apply {
+    return DefaultMutableTreeNode(Node.RootNode(":app")).apply {
         addHomeTree()
         addDetailTree()
-        feature("nowplaying")
-        feature("premium").apply {
-            library("premium")
+        node(":feature:nowplaying:internal")
+        node(":feature:premium:internal").apply {
+            node(":library:premium:public")
         }
         addSearchTree()
     }
 }
 
 private fun DefaultMutableTreeNode.addHomeTree() {
-    feature("home").apply {
+    node(":feature:home:internal").apply {
         addDetailTree()
-        library("home")
+        node(":library:home:public")
     }
 }
 
 private fun DefaultMutableTreeNode.addDetailTree() {
-    feature("detail").apply {
-        feature("nowplaying")
-        library("detail")
+    node(":feature:detail:internal").apply {
+        node(":feature:nowplaying:public")
+        node(":library:detail:public")
     }
 }
 
 private fun DefaultMutableTreeNode.addSearchTree() {
-    feature("search").apply {
-        library("search")
+    node(":feature:search:internal").apply {
+        node(":library:search:public")
     }
 }
 
-private fun DefaultMutableTreeNode.feature(moduleName: String): DefaultMutableTreeNode {
-    return add(moduleName, NodeType.FEATURE)
+// :library:foo:public
+private fun isLibrary(moduleName: String): Boolean {
+    return moduleName.startsWith(":library") && moduleName.endsWith(":public")
 }
 
-private fun DefaultMutableTreeNode.library(moduleName: String): DefaultMutableTreeNode {
-    return add(moduleName, NodeType.LIBRARY)
+// :feature:foo:internal
+// :feature:foo:public
+private fun isFeature(moduleName: String): Boolean {
+    return moduleName.startsWith(":feature") &&
+            (moduleName.endsWith(":public") || moduleName.endsWith(":internal"))
 }
 
-private fun DefaultMutableTreeNode.add(moduleName: String, nodeType: NodeType): DefaultMutableTreeNode =
-    DefaultMutableTreeNode(NodeData(moduleName, nodeType)).also { add(it) }
+private fun DefaultMutableTreeNode.node(moduleName: String): DefaultMutableTreeNode {
+    val node = allNodes.getOrPut(moduleName) {
+        when {
+            isLibrary(moduleName) -> Node.LibraryNode(moduleName)
+            isFeature(moduleName) -> Node.FeatureNode(moduleName)
+            else -> throw IllegalStateException("Module name $moduleName not found")
+        }
+    }
+
+    return add(node)
+}
+
+private val allNodes = mutableMapOf<String, Node>()
+private fun DefaultMutableTreeNode.add(node: Node): DefaultMutableTreeNode {
+    return DefaultMutableTreeNode(node).also {
+        add(it)
+        addFakeIfNeeded(node.name)
+    }
+}
+
+// What do we do for...
+// :library:foo:public -> :library:foo:fake // We can't be guaranteed that a fake exists unless we check.
+private fun DefaultMutableTreeNode.addFakeIfNeeded(nodeName: String) {
+    val regex = Regex(""":library:([^:]+):fake""")
+    val match = regex.find(nodeName)
+    if (match == null) {
+        return
+    }
+    add(
+        Node.FakeLibraryNode(
+            name = match.groupValues[1],
+            isSelected = false,
+        )
+    )
+}

@@ -1,7 +1,11 @@
 package com.johnbuhanan
 
 
-import java.awt.*
+import com.intellij.icons.AllIcons
+import java.awt.Color
+import java.awt.Component
+import java.awt.FlowLayout
+import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.IOException
 import javax.imageio.ImageIO
@@ -14,19 +18,20 @@ import javax.swing.tree.TreeCellRenderer
 internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRenderer, TreeCellEditor {
     private val panel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0))
     private val checkBox = JCheckBox()
-    private val switch = SwitchButtonA().apply {
-        preferredSize = Dimension(40, 10)
-    }
+    private val radioButton = JRadioButton()
+//        .apply {
+//        preferredSize = Dimension(40, 10)
+//    }
 
-    private var currentData: NodeData? = null
+    private var currentData: Node? = null
 
     init {
-        switch.addActionListener {
-            currentData?.useFake = switch.isSelected
+        checkBox.addActionListener {
+            currentData?.isSelected = checkBox.isSelected
             fireEditingStopped()
         }
-        checkBox.addActionListener {
-            currentData?.selected = checkBox.isSelected
+        radioButton.addActionListener {
+            currentData?.isSelected = checkBox.isSelected
             fireEditingStopped()
         }
     }
@@ -47,25 +52,34 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
 
     private fun buildComponent(value: Any?): JPanel {
         panel.removeAll()
-        val node = value as? DefaultMutableTreeNode ?: return panel
-        val data = node.userObject as? NodeData ?: return panel
-        currentData = data
+        val treeNode = value as? DefaultMutableTreeNode ?: return panel
+        val node = treeNode.userObject as? Node ?: return panel
+        currentData = node
 
-        if (data.type == NodeType.FEATURE) {
-            checkBox.text = data.name
-            checkBox.isSelected = data.selected
-            panel.add(checkBox)
-        } else if (data.type == NodeType.LIBRARY) {
-            val iconLabel = JLabel(getRedIcon("/toolWindow/fake.png"))
-            val nameLabel = JLabel(data.name)
+        when (node) {
+            is Node.LibraryNode -> {
+                radioButton.isSelected = node.isSelected
 
-            val switchButtonA = SwitchButtonA().apply {
-                preferredSize = Dimension(40, checkBox.preferredSize.height)
+                val iconLabel = JLabel(AllIcons.Nodes.Library)
+                val nameLabel = JLabel(node.name)
+                panel.add(radioButton)
+                panel.add(iconLabel)
+                panel.add(nameLabel)
             }
 
-            panel.add(iconLabel)
-            panel.add(nameLabel)
-            panel.add(switchButtonA)
+            is Node.FakeLibraryNode -> {
+                radioButton.isSelected = node.isSelected
+                radioButton.text = node.name
+                val iconLabel = JLabel(getRedIcon("/toolWindow/fake.png"))
+                panel.add(radioButton)
+                panel.add(iconLabel)
+            }
+
+            is Node.RootNode, is Node.FeatureNode -> {
+                checkBox.text = node.name
+                checkBox.isSelected = node.isSelected
+                panel.add(checkBox)
+            }
         }
 
         return panel
