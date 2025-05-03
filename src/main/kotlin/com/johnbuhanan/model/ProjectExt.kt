@@ -36,13 +36,12 @@ fun Project.addProject(projectPath: String): Project {
             isFeature(projectPath) -> FeatureProject(projectPath)
             else -> throw IllegalStateException("Module name $projectPath not found")
         }
-    }
-    add(newProject)
+    }.also { add(it) }
+
     if (newProject is LibraryProject) {
-        val fakeLibraryProject = allProjects.getOrPut(projectPath.toFakeLibrary()) {
-            FakeLibraryProject(projectPath)
-        }
-        add(fakeLibraryProject)
+        allProjects.getOrPut(projectPath.toFakeLibrary()) {
+            FakeLibraryProject(projectPath).also { it.isSelected = false }
+        }.also { add(it) }
     }
 
     return newProject
