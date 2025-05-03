@@ -29,6 +29,11 @@ class SwitchButtonA : JComponent() {
         })
     }
 
+    override fun doLayout() {
+        super.doLayout()
+        slidePosition = if (isSelected) width - height else 0
+    }
+
     fun addActionListener(l: ActionListener) {
         listenerList.add(ActionListener::class.java, l)
     }
@@ -54,7 +59,7 @@ class SwitchButtonA : JComponent() {
     }
 
     override fun getPreferredSize(): Dimension {
-        return Dimension(40, 16) // Width can be flexible; height controls the vertical size
+        return Dimension(50, 15) // Width can be flexible; height controls the vertical size
     }
 
     @Suppress("UseJBColor")

@@ -1,10 +1,10 @@
 package com.johnbuhanan
 
 
-import com.intellij.icons.AllIcons.Nodes.Library
-import java.awt.Component
-import java.awt.Dimension
-import java.awt.FlowLayout
+import java.awt.*
+import java.awt.image.BufferedImage
+import java.io.IOException
+import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeCellEditor
@@ -56,10 +56,12 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
             checkBox.isSelected = data.selected
             panel.add(checkBox)
         } else if (data.type == NodeType.LIBRARY) {
-            val iconLabel = JLabel(Library)
+            val iconLabel = JLabel(getRedIcon("/toolWindow/fake.png"))
             val nameLabel = JLabel(data.name)
-            val switchButtonA = SwitchButtonA()
-            switchButtonA.preferredSize = Dimension(40, checkBox.preferredSize.height)
+
+            val switchButtonA = SwitchButtonA().apply {
+                preferredSize = Dimension(40, checkBox.preferredSize.height)
+            }
 
             panel.add(iconLabel)
             panel.add(nameLabel)
@@ -68,4 +70,45 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
 
         return panel
     }
+
+    fun getRedIcon(resourcePath: String): Icon {
+        // Load the original image as BufferedImage
+        val originalImage = try {
+            ImageIO.read(javaClass.getResource(resourcePath))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return ImageIcon() // Return an empty icon in case of error
+        }
+
+        val width = originalImage.width
+        val height = originalImage.height
+
+        // Create a new BufferedImage to modify
+        val redImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+        val g2d = redImage.createGraphics()
+        g2d.drawImage(originalImage, 0, 0, null)
+        g2d.dispose()
+
+        // Iterate through the pixels and change black or dark pixels to red
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val pixel = redImage.getRGB(x, y)
+
+                // Get the alpha, red, green, and blue values
+                val alpha = (pixel shr 24) and 0xFF
+                val r = (pixel shr 16) and 0xFF
+                val g = (pixel shr 8) and 0xFF
+                val b = pixel and 0xFF
+
+                // Change only non-transparent, dark pixels to red
+                if (alpha > 0 && r < 50 && g < 50 && b < 50) {
+                    redImage.setRGB(x, y, Color.RED.rgb)
+                }
+            }
+        }
+
+        val scaledImage = ImageIcon(redImage).image.getScaledInstance(15, 15, Image.SCALE_SMOOTH)
+        return ImageIcon(scaledImage)
+    }
 }
+
