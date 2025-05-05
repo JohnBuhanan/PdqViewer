@@ -1,13 +1,9 @@
-package com.johnbuhanan.model
+package com.johnbuhanan.pdq.model
 
-import com.johnbuhanan.model.Project.*
+import com.johnbuhanan.featureselector.model.SelectorNode
 import java.nio.file.Path
 import javax.swing.tree.DefaultMutableTreeNode
 import kotlin.io.path.readText
-
-val allProjects = mutableMapOf<String, Project>()
-
-fun String.toFakeLibrary(): String = replace(":public", ":fake")
 
 /**
  * Given an input string like
@@ -57,61 +53,18 @@ private fun String.toKebab(): String {
     return kebab
 }
 
-fun Project.toTreeNode(): DefaultMutableTreeNode {
-    val treeNode = DefaultMutableTreeNode(this)
-
-    for (dp in dependsOn) {
-        treeNode.add(dp.toTreeNode())
-    }
-
-    return treeNode
+fun ProjectNode.add(projectNode: ProjectNode) {
+    dependsOn.add(projectNode)
 }
 
-private fun isLibrary(projectPath: String): Boolean {
-    return projectPath.startsWith(":library") &&
-            (projectPath.endsWith(":public") || projectPath.endsWith(":internal"))
+fun String.toProject(): ProjectNode {
+    return ProjectNode(toProjectPath())
 }
 
-// :feature:foo:internal
-// :feature:foo:public
-private fun isFeature(projectPath: String): Boolean {
-    return projectPath.startsWith(":feature") &&
-            (projectPath.endsWith(":public") || projectPath.endsWith(":internal"))
-}
-
-private fun isApp(projectPath: String): Boolean {
-    return projectPath.startsWith(":feature") && projectPath.endsWith(":app")
-}
-
-private fun isRoot(projectPath: String): Boolean {
-    return projectPath == ":app"
-}
-
-private fun isSharedTest(projectPath: String): Boolean {
-    return projectPath.endsWith(":shared-test")
-}
-
-fun Project.add(project: Project) {
-    dependsOn.add(project)
-}
-
-fun String.toProject(): Project {
-    val projectPath = toProjectPath()
-
-    return when {
-        isLibrary(projectPath) -> LibraryProject(projectPath)
-        isFeature(projectPath) -> FeatureProject(projectPath)
-        isApp(projectPath) -> AppProject(projectPath)
-        isRoot(projectPath) -> RootProject(projectPath)
-        isSharedTest(projectPath) -> SharedTestProject(projectPath)
-        else -> throw IllegalStateException("Module name $projectPath not found")
-    }
-}
-
-fun Project.readProjectDependencies(
+fun ProjectNode.readProjectDependencies(
     basePath: Path,
-    allProjects: Map<String, Project>,
-): Set<Project> {
+    allProjects: Map<String, ProjectNode>,
+): Set<ProjectNode> {
     val buildFile = absolutePath(basePath).resolve("build.gradle")
 
     return buildFile.readText().lineSequence()
@@ -125,7 +78,7 @@ fun Project.readProjectDependencies(
         .toSet()
 }
 
-private fun Project.absolutePath(basePath: Path): Path {
+private fun ProjectNode.absolutePath(basePath: Path): Path {
     return projectPath.toAbsolutePath(basePath)
 }
 

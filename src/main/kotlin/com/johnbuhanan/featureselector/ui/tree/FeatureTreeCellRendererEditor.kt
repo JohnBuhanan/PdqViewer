@@ -1,8 +1,8 @@
-package com.johnbuhanan.ui.tree
+package com.johnbuhanan.featureselector.ui.tree
 
 import com.intellij.icons.AllIcons
-import com.johnbuhanan.model.Project
-import com.johnbuhanan.ui.util.getFakeIcon
+import com.johnbuhanan.featureselector.model.SelectorNode
+import com.johnbuhanan.featureselector.ui.util.getFakeIcon
 import java.awt.Component
 import java.awt.FlowLayout
 import javax.swing.*
@@ -14,15 +14,15 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
     private val panel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0))
     private val checkBox = JCheckBox()
     private val radioButton = JRadioButton()
-    private var currentProject: Project? = null
+    private var currentSelectorNode: SelectorNode? = null
 
     init {
         checkBox.addActionListener {
-            currentProject?.isSelected = checkBox.isSelected
+            currentSelectorNode?.isSelected = checkBox.isSelected
             fireEditingStopped()
         }
         radioButton.addActionListener {
-            currentProject?.isSelected = checkBox.isSelected
+            currentSelectorNode?.isSelected = checkBox.isSelected
             fireEditingStopped()
         }
     }
@@ -39,12 +39,12 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
         return buildComponent(value)
     }
 
-    override fun getCellEditorValue(): Any? = currentProject
+    override fun getCellEditorValue(): Any? = currentSelectorNode
 
-    private fun updateLibrary(project: Project, icon: Icon) {
-        radioButton.isSelected = project.isSelected
+    private fun updateLibrary(selectorNode: SelectorNode, icon: Icon) {
+        radioButton.isSelected = selectorNode.isSelected
         val iconLabel = JLabel(icon)
-        val nameLabel = JLabel(project.displayName)
+        val nameLabel = JLabel(selectorNode.displayName)
         panel.add(radioButton)
         panel.add(iconLabel)
         panel.add(nameLabel)
@@ -53,29 +53,26 @@ internal class FeatureTreeCellRendererEditor : AbstractCellEditor(), TreeCellRen
     private fun buildComponent(value: Any?): JPanel {
         panel.removeAll()
         val treeNode = value as? DefaultMutableTreeNode ?: return panel
-        val project = treeNode.userObject as? Project ?: return panel
-        currentProject = project
+        val selectorNode = treeNode.userObject as? SelectorNode ?: return panel
+        currentSelectorNode = selectorNode
 
-        when (project) {
-            is Project.LibraryProject -> {
-                updateLibrary(project, AllIcons.Nodes.Library)
+        when (selectorNode) {
+            is SelectorNode.LibraryNode -> {
+                updateLibrary(selectorNode, AllIcons.Nodes.Library)
             }
 
-            is Project.FakeLibraryProject -> {
-                updateLibrary(project, getFakeIcon())
+            is SelectorNode.FakeLibraryNode -> {
+                updateLibrary(selectorNode, getFakeIcon())
             }
 
-            is Project.RootProject, is Project.FeatureProject -> {
+            is SelectorNode.RootNode, is SelectorNode.FeatureNode, is SelectorNode.AppNode, is SelectorNode.SharedTestProject -> {
 //                val iconLabel = JLabel(AllIcons.Nodes.Module)
-                val nameLabel = JLabel(project.displayName)
-                checkBox.isSelected = project.isSelected
+                val nameLabel = JLabel(selectorNode.displayName)
+                checkBox.isSelected = selectorNode.isSelected
                 panel.add(checkBox)
 //                panel.add(iconLabel)
                 panel.add(nameLabel)
             }
-
-            is Project.AppProject -> TODO()
-            is Project.SharedTestProject -> TODO()
         }
 
         return panel

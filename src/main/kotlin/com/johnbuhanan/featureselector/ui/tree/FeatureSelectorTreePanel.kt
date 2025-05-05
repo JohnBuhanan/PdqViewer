@@ -1,9 +1,8 @@
-package com.johnbuhanan.ui.tree
+package com.johnbuhanan.featureselector.ui.tree
 
 import com.intellij.ui.treeStructure.Tree
-import com.johnbuhanan.model.Project
-import com.johnbuhanan.model.ProjectGraph
-import com.johnbuhanan.model.toTreeNode
+import com.johnbuhanan.featureselector.model.SelectorGraph
+import com.johnbuhanan.featureselector.model.toTreeNode
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -12,15 +11,13 @@ import javax.swing.UIManager
 import javax.swing.plaf.basic.BasicTreeUI
 
 class FeatureSelectorTreePanel(
-    private val projectGraph: ProjectGraph,
+    private val selectorGraph: SelectorGraph,
 ) : JPanel() {
     // ComboBox up top?
     private val tree by lazy {
         layout = BorderLayout()
-        val rootProject = Project.RootProject("Songify").apply {
-            dependsOn.addAll(projectGraph.allFeatureProjects)
-        }
-        val rootTreeNode = rootProject.toTreeNode()
+
+        val rootTreeNode = selectorGraph.rootNode.toTreeNode()
         Tree(rootTreeNode).apply {
             cellRenderer = FeatureTreeCellRendererEditor()
             cellEditor = FeatureTreeCellRendererEditor()

@@ -1,4 +1,4 @@
-package com.johnbuhanan.ui.util
+package com.johnbuhanan.featureselector.ui.util
 
 import java.awt.Color
 import java.awt.Image
