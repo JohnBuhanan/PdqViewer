@@ -51,7 +51,7 @@ private fun String.toKebab(): String {
     return kebab
 }
 
-fun String.toProject(): ProjectNode {
+fun String.toProjectNode(): ProjectNode {
     return ProjectNode(toProjectPath())
 }
 
@@ -68,7 +68,7 @@ fun ProjectNode.readProjectDependencies(
             val matched = PROJECT_REFERENCE_REGEX.find(line)?.groupValues?.get(1)
             inferred ?: matched
         }
-        .mapNotNull { depPath -> allProjects[depPath.toProject().projectPath] }
+        .mapNotNull { depPath -> allProjects[depPath.toProjectNode().projectPath] }
         .toSet()
 }
 

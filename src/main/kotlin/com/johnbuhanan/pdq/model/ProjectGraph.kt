@@ -7,7 +7,7 @@ class ProjectGraph(
     basePath: Path,
 ) {
     val allProjects: Map<String, ProjectNode> by lazy {
-        val projects = readAllProjectPaths(basePath).associateWith { it.toProject() }
+        val projects = readAllProjectPaths(basePath).associateWith { it.toProjectNode() }
 
         for (project in projects.values) {
             val projectDependencies = project.readProjectDependencies(basePath, projects)
