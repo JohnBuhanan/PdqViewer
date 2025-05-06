@@ -14,10 +14,6 @@ sealed class SelectorNode {
             }
         }
 
-    fun add(node: SelectorNode) {
-        dependsOn.add(node)
-    }
-
     data class RootNode(
         override val projectPath: String,
     ) : SelectorNode()

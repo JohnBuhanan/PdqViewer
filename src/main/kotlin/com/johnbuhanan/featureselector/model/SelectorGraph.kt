@@ -19,7 +19,7 @@ class SelectorGraph(
             if (dps == selectorNode) {
                 continue
             }
-            dps?.let { selectorNode?.add(it) }
+            dps?.let { selectorNode?.dependsOn?.add(it) }
         }
 
         return selectorNode
@@ -29,7 +29,7 @@ class SelectorGraph(
         // if it contains an :internal entry, then store it as internal, otherwise public
         var effectivePath = replace(":public", ":internal")
         if (!projectGraph.allProjects.contains(effectivePath)) {
-            effectivePath = this
+            effectivePath = this // No :internal? Back to default.
         }
         val selectorNode: SelectorNode = allSelectorNodes.getOrPut(effectivePath) {
             when {
