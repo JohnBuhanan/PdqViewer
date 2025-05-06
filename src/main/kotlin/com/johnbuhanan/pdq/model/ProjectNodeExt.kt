@@ -1,8 +1,6 @@
 package com.johnbuhanan.pdq.model
 
-import com.johnbuhanan.featureselector.model.SelectorNode
 import java.nio.file.Path
-import javax.swing.tree.DefaultMutableTreeNode
 import kotlin.io.path.readText
 
 /**
@@ -51,10 +49,6 @@ private fun String.toKebab(): String {
         .lowercase()
 
     return kebab
-}
-
-fun ProjectNode.add(projectNode: ProjectNode) {
-    dependsOn.add(projectNode)
 }
 
 fun String.toProject(): ProjectNode {

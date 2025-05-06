@@ -6,11 +6,8 @@ import kotlin.io.path.readLines
 class ProjectGraph(
     basePath: Path,
 ) {
-
-    private val allProjectPaths: Set<String> = readAllProjectPaths(basePath)
-
     val allProjects: Map<String, ProjectNode> by lazy {
-        val projects = allProjectPaths.associateWith { it.toProject() }
+        val projects = readAllProjectPaths(basePath).associateWith { it.toProject() }
 
         for (project in projects.values) {
             val projectDependencies = project.readProjectDependencies(basePath, projects)
