@@ -12,8 +12,7 @@ import java.nio.file.Path
 
 class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val basePath = Path.of("/Users/johnbuhanan/StudioProjects/Songify")
-//        val basePath = Path.of(project.basePath!!) // uncomment before publish
+        val basePath = Path.of(project.basePath!!)
         val projectGraph = ProjectGraph(basePath)
         val selectorGraph = SelectorGraph(projectGraph)
         val panel = FeatureSelectorTreePanel(selectorGraph)
