@@ -120,12 +120,10 @@ val styleSheet = """
 node {
     size: 10px, 10px;
     fill-color: #3366cc;
-	
 }
 
 edge {
-	shape: line;
-	fill-color: #99999955;
+	fill-color: #99999905;
 }
 """.trimIndent()
 
@@ -142,7 +140,7 @@ private fun ProjectGraph.toMultiGraph(): MultiGraph {
     workingSet.forEach { projectNode ->
         val n = multiGraph.addNode(projectNode.projectPath)
 //        n.setAttribute("ui.label", n.id)
-        n.setAttribute("layout.weight", 50)
+        n.setAttribute("layout.weight", 100)
     }
 
     workingSet.forEach { projectNode ->
@@ -150,7 +148,7 @@ private fun ProjectGraph.toMultiGraph(): MultiGraph {
             val a = projectNode.projectPath
             val b = pd.projectPath
             val edge = multiGraph.addEdge("$a$b", a, b, true)
-            edge.setAttribute("layout.weight", 50)
+            edge.setAttribute("layout.weight", 100)
         }
     }
 
