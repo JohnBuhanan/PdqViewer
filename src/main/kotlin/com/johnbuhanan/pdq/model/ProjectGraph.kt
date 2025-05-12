@@ -8,9 +8,10 @@ class ProjectGraph(
     basePath: Path,
 ) {
     val allProjects: Map<String, ProjectNode> by lazy { getAllProjects(basePath) }
+    var workingSet: Set<ProjectNode> = allProjects.values.toSet()
 
     val rootNode: ProjectNode = ProjectNode("Songify").also {
-        val androidApplication = allProjects[":app"]!!
+        val androidApplication = allProjects[":Tinder"]!!
         it.dependsOn.add(androidApplication)
     }
 
@@ -35,7 +36,7 @@ private fun getAllProjects(basePath: Path): Map<String, ProjectNode> {
 
 private fun readAllProjectPaths(basePath: Path): Set<String> {
     val settingsFile = basePath.resolve("settings-all.gradle")
-    val regex = Regex("\"(:[^\"]+)\"") // Match anything inside quotes
+    val regex = Regex("\'(:[^\"]+)\'") // Match anything inside quotes
     val lines = settingsFile.readLines()
 
     return lines
@@ -72,4 +73,22 @@ private fun ProjectNode.readProjectDependencies(
 
 private fun ProjectNode.absolutePath(basePath: Path): Path {
     return projectPath.toAbsolutePath(basePath)
+}
+
+fun bfsProjectsBy(
+    starting: Set<ProjectNode>,
+    neighborSelector: (ProjectNode) -> Set<ProjectNode>
+): Set<ProjectNode> {
+    val visited = mutableSetOf<ProjectNode>()
+    val queue = ArrayDeque(starting)
+
+    while (queue.isNotEmpty()) {
+        val current = queue.removeFirst()
+        if (current !in visited) {
+            visited += current
+            queue += neighborSelector(current).filterNot { it in visited }
+        }
+    }
+
+    return visited
 }
