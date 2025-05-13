@@ -17,7 +17,7 @@ import javax.swing.JPanel
 import kotlin.streams.asSequence
 
 object GraphViewBuilder {
-    fun buildComponent(projectGraph: ProjectGraph): JComponent {
+    fun buildGraphView(projectGraph: ProjectGraph): JComponent {
         System.setProperty("org.graphstream.ui", "swing")
 
         val graph = projectGraph.toMultiGraph()
