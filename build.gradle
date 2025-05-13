@@ -24,6 +24,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.graphstream:gs-core:2.0"
     implementation "org.graphstream:gs-ui-swing:2.0"
+    implementation "org.graphstream:gs-algo:2.0"
 }
 
 intellijPlatform {

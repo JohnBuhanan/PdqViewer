@@ -7,16 +7,15 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.johnbuhanan.pdq.model.ProjectGraph
 import org.graphstream.graph.implementations.MultiGraph
-import org.graphstream.ui.layout.springbox.implementations.SpringBox
-import org.graphstream.ui.swing_viewer.DefaultView
+import org.graphstream.ui.layout.springbox.implementations.LinLog
 import org.graphstream.ui.swing_viewer.SwingViewer
-import org.graphstream.ui.view.GraphRenderer
 import org.graphstream.ui.view.View
 import org.graphstream.ui.view.Viewer
-import java.awt.Graphics
+import java.awt.BorderLayout
 import java.nio.file.Path
+import javax.swing.JButton
 import javax.swing.JComponent
-
+import javax.swing.JPanel
 
 class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
@@ -52,17 +51,55 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
         cam.setViewCenter(x + 0.0001, y, 0.0)
     }
 
+    private fun getViewerWithAlgAndLayout(projectGraph: ProjectGraph): Viewer {
+        val multiGraph = projectGraph.toMultiGraph()
+        /**
+         * ======ALGORITHM======
+         */
+        //    val tscc = TarjanStronglyConnectedComponents()
+        //    tscc.init(multiGraph)
+        //    tscc.compute()
+
+        //    val bc = BetweennessCentrality()
+        //    bc.init(multiGraph)
+        //    bc.compute()
+
+        //    val tsk = TopologicalSortDFS()
+        //    tsk.init(multiGraph)
+        //    tsk.compute()
+        //    multiGraph.nodes().forEach { n ->
+        //        n.setAttribute("label", n.getAttribute(tscc.sccIndexAttribute))
+        //    }
+
+        //    val wp = WelshPowell()
+        //    wp.init(multiGraph)
+        //    wp.compute()
+        //    for (node in multiGraph.nodes()) {
+        //        val color: Int = node.getAttribute("WelshPowell.color").toString().toInt()
+        //        node.setAttribute("ui.class", "color$color")
+        //    }
+        //        val layout = SpringBox(false).apply {
+        //            stabilizationLimit = 0.9
+        //        }
+        /**
+         * ======LAYOUT======
+         */
+        val layout = LinLog()
+
+        // val layout = HierarchicalLayout().apply {
+        //     stabilizationLimit = 0.35
+        // }
+
+
+        return SwingViewer(multiGraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD).apply {
+            enableAutoLayout(layout)
+        }
+    }
+
     private fun getGraphComponent(projectGraph: ProjectGraph): JComponent {
         System.setProperty("org.graphstream.ui", "swing")
 
-        val layout = SpringBox(false).apply {
-            stabilizationLimit = 0.95
-        }
-
-        val multiGraph = projectGraph.toMultiGraph()
-        val viewer = SwingViewer(multiGraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD).apply {
-            enableAutoLayout(layout)
-        }
+        val viewer = getViewerWithAlgAndLayout(projectGraph)
 
         val view = viewer.addDefaultView(false) as JComponent
         val camera = (view as View).camera
@@ -77,17 +114,17 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
         }
 
         // UI panel with zoom controls
-        val panel = javax.swing.JPanel(java.awt.BorderLayout())
+        val panel = JPanel(BorderLayout())
 
         // Zoom buttons
-        val controls = javax.swing.JPanel().apply {
-            add(javax.swing.JButton("+").apply {
+        val controls = JPanel().apply {
+            add(JButton("+").apply {
                 addActionListener { zoom(0.8) } // Zoom in (lower % = zoom in)
             })
-            add(javax.swing.JButton("–").apply {
+            add(JButton("–").apply {
                 addActionListener { zoom(1.25) } // Zoom out (higher % = zoom out)
             })
-            add(javax.swing.JButton("Reset").apply {
+            add(JButton("Reset").apply {
                 addActionListener {
                     camera.resetView()
                     camera.viewPercent = 1.0
@@ -119,12 +156,18 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
 val styleSheet = """
 node {
     size: 10px, 10px;
-    fill-color: #3366cc;
+    fill-color: blue;
 }
 
 edge {
 	fill-color: #99999905;
 }
+
+node.color0 { fill-color: red; }
+node.color1 { fill-color: blue; }
+node.color2 { fill-color: green; }
+node.color3 { fill-color: yellow; }
+node.color4 { fill-color: purple; }
 """.trimIndent()
 
 private fun ProjectGraph.toMultiGraph(): MultiGraph {
