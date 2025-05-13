@@ -11,7 +11,7 @@ class ProjectGraph(
     var workingSet: Set<ProjectNode> = allProjects.values.toSet()
 
     val rootNode: ProjectNode = ProjectNode("Songify").also {
-        val androidApplication = allProjects[":Tinder"]!!
+        val androidApplication = allProjects[":app"]!!
         it.dependsOn.add(androidApplication)
     }
 
@@ -36,7 +36,7 @@ private fun getAllProjects(basePath: Path): Map<String, ProjectNode> {
 
 private fun readAllProjectPaths(basePath: Path): Set<String> {
     val settingsFile = basePath.resolve("settings-all.gradle")
-    val regex = Regex("\'(:[^\"]+)\'") // Match anything inside quotes
+    val regex = Regex("\"(:[^\"]+)\"") // Match anything inside quotes
     val lines = settingsFile.readLines()
 
     return lines
