@@ -6,12 +6,12 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.johnbuhanan.pdq.model.ProjectGraph
+import org.graphstream.algorithm.PageRank
 import org.graphstream.graph.implementations.MultiGraph
-import org.graphstream.ui.layout.springbox.implementations.LinLog
 import org.graphstream.ui.swing_viewer.SwingViewer
+import org.graphstream.ui.swing_viewer.ViewPanel
 import org.graphstream.ui.view.View
 import org.graphstream.ui.view.Viewer
-import java.awt.BorderLayout
 import java.nio.file.Path
 import javax.swing.JButton
 import javax.swing.JComponent
@@ -53,6 +53,7 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
 
     private fun getViewerWithAlgAndLayout(projectGraph: ProjectGraph): Viewer {
         val multiGraph = projectGraph.toMultiGraph()
+
         /**
          * ======ALGORITHM======
          */
@@ -81,18 +82,23 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
         //        val layout = SpringBox(false).apply {
         //            stabilizationLimit = 0.9
         //        }
+        val pr = PageRank()
+        pr.init(multiGraph)
+        pr.compute()
+
         /**
          * ======LAYOUT======
          */
-        val layout = LinLog()
+//        val layout = LinLog()
 
         // val layout = HierarchicalLayout().apply {
         //     stabilizationLimit = 0.35
         // }
 
-
+//        val layout = SpringBox()
         return SwingViewer(multiGraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD).apply {
-            enableAutoLayout(layout)
+//            enableAutoLayout(layout)
+            enableAutoLayout()
         }
     }
 
@@ -101,7 +107,7 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
 
         val viewer = getViewerWithAlgAndLayout(projectGraph)
 
-        val view = viewer.addDefaultView(false) as JComponent
+        val view = viewer.addDefaultView(false) as ViewPanel
         val camera = (view as View).camera
 
         // Zoom helper
@@ -112,9 +118,6 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
 //            view.repaint()
 //            view.revalidate()
         }
-
-        // UI panel with zoom controls
-        val panel = JPanel(BorderLayout())
 
         // Zoom buttons
         val controls = JPanel().apply {
@@ -132,31 +135,19 @@ class FeatureSelectorToolWindowFactory : ToolWindowFactory, DumbAware {
             })
         }
 
-        panel.add(view as JComponent, java.awt.BorderLayout.CENTER)
-        panel.add(controls, java.awt.BorderLayout.SOUTH)
-
-        return panel
+        return view
     }
 }
-
-//class CustomView(viewer: Viewer, identifier: String, graphRenderer: GraphRenderer) :
-//    DefaultView(viewer, identifier, graphRenderer) {
-//    public override fun paintComponent(g: Graphics?) {
-//        val stackElements = Thread.currentThread().getStackTrace()
-//        for (i in stackElements.indices) {
-//            if (stackElements[i].getClassName() == ToolWindows::class.java.getName()) {
-//                repaint()
-//                break
-//            }
-//        }
-//        super.paintComponent(g)
-//    }
-//}
 
 val styleSheet = """
 node {
     size: 10px, 10px;
-    fill-color: blue;
+//    shape: box;
+    fill-mode: plain;   /* Default.          */
+    fill-color: white;    /* Default is black. */
+    stroke-mode: plain; /* Default is none.  */
+    stroke-color: blue; /* Default is black. */
+    stroke-width: 5px;
 }
 
 edge {
