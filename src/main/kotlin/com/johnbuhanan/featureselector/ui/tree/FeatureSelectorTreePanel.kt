@@ -2,8 +2,6 @@ package com.johnbuhanan.featureselector.ui.tree
 
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.treeStructure.Tree
-import com.johnbuhanan.featureselector.model.SelectorGraph
-import com.johnbuhanan.featureselector.model.toTreeNode
 import com.johnbuhanan.pdq.model.ProjectGraph
 import java.awt.BorderLayout
 import javax.swing.JPanel
@@ -17,15 +15,14 @@ class FeatureSelectorTreePanel(
     projectGraph: ProjectGraph,
 ) : JPanel(BorderLayout()) {
 
-    private val selectorGraph = SelectorGraph(projectGraph)
-    private val featureList = selectorGraph.features.map { it.projectPath }.sorted()
-    private val comboBox = ComboBox(featureList.toTypedArray())
+    private val treeGraph = TreeGraph(projectGraph)
+    private val featurePaths = treeGraph.featurePaths
+    private val comboBox = ComboBox(featurePaths.toTypedArray())
     private val tree = Tree().apply {
         cellRenderer = FeatureTreeCellRendererEditor()
         cellEditor = FeatureTreeCellRendererEditor()
         isEditable = true
         setShowsRootHandles(true)
-        isRootVisible = true
         putClientProperty("JTree.lineStyle", "Angled")
     }
 
@@ -33,15 +30,13 @@ class FeatureSelectorTreePanel(
         UIManager.put("Tree.paintLines", true)
         tree.ui = BasicTreeUI()
 
-        // Top: dropdown
         add(comboBox, BorderLayout.NORTH)
-
-        // Center: scrollable tree
         add(JScrollPane(tree), BorderLayout.CENTER)
 
-        // Set initial tree
-        updateTreeModel(featureList.first())
+        // Initial tree
+        updateTreeModel(featurePaths.first())
 
+        // Listener
         comboBox.addActionListener {
             val selectedId = comboBox.selectedItem as? String ?: return@addActionListener
             updateTreeModel(selectedId)
@@ -49,9 +44,9 @@ class FeatureSelectorTreePanel(
     }
 
     private fun updateTreeModel(featurePath: String) {
-        val selected = selectorGraph.features.find { it.projectPath == featurePath } ?: return
-        val rootNode = selected.toTreeNode()
+        val rootNode = treeGraph.allGraphNodes[featurePath]!!
         tree.model = DefaultTreeModel(rootNode)
+        tree.isRootVisible = true
         expandAllRows()
     }
 

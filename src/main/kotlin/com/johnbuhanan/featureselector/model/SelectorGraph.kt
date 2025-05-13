@@ -7,7 +7,7 @@ class SelectorGraph(
     private val projectGraph: ProjectGraph,
 ) {
 
-    private val allSelectorNodes: MutableMap<String, SelectorNode> = mutableMapOf()
+    val allSelectorNodes: MutableMap<String, SelectorNode> = mutableMapOf()
 
     val rootNode: SelectorNode = projectGraph.rootNode.toSelectorNode()!!
 

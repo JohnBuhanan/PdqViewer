@@ -27,13 +27,3 @@ fun String.isRoot(): Boolean {
 fun String.isSharedTest(): Boolean {
     return endsWith(":shared-test")
 }
-
-fun SelectorNode.toTreeNode(): DefaultMutableTreeNode {
-    val treeNode = DefaultMutableTreeNode(this)
-
-    for (dp in dependsOn) {
-        treeNode.add(dp.toTreeNode())
-    }
-
-    return treeNode
-}
