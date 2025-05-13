@@ -15,6 +15,10 @@ class ProjectGraph(
         it.dependsOn.add(androidApplication)
     }
 
+    val features: List<ProjectNode> by lazy {
+        allProjects.values.filter { it.projectPath.startsWith(":feature") && it.projectPath.endsWith(":internal") }
+    }
+
     override fun toString(): String {
         return allProjects.values.joinToString { it.toString() }
     }

@@ -1,5 +1,6 @@
 package com.johnbuhanan.featureselector.ui.tree
 
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.treeStructure.Tree
 import com.johnbuhanan.featureselector.model.SelectorGraph
 import com.johnbuhanan.featureselector.model.toTreeNode
@@ -10,35 +11,48 @@ import javax.swing.JScrollPane
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.plaf.basic.BasicTreeUI
+import javax.swing.tree.DefaultTreeModel
 
 class FeatureSelectorTreePanel(
-    private val projectGraph: ProjectGraph,
-) : JPanel() {
-    // ComboBox up top?
-    private val tree by lazy {
-        layout = BorderLayout()
+    projectGraph: ProjectGraph,
+) : JPanel(BorderLayout()) {
 
-        val selectorGraph = SelectorGraph(projectGraph)
-
-        val rootTreeNode = selectorGraph.rootNode.toTreeNode()
-        Tree(rootTreeNode).apply {
-            cellRenderer = FeatureTreeCellRendererEditor()
-            cellEditor = FeatureTreeCellRendererEditor()
-            isEditable = true
-            setShowsRootHandles(true)
-            isRootVisible = true
-            putClientProperty("JTree.lineStyle", "Angled")
-        }.also {
-            add(JScrollPane(it), BorderLayout.CENTER)
-        }
+    private val selectorGraph = SelectorGraph(projectGraph)
+    private val featureList = selectorGraph.features.map { it.projectPath }.sorted()
+    private val comboBox = ComboBox(featureList.toTypedArray())
+    private val tree = Tree().apply {
+        cellRenderer = FeatureTreeCellRendererEditor()
+        cellEditor = FeatureTreeCellRendererEditor()
+        isEditable = true
+        setShowsRootHandles(true)
+        isRootVisible = true
+        putClientProperty("JTree.lineStyle", "Angled")
     }
 
     init {
         UIManager.put("Tree.paintLines", true)
         tree.ui = BasicTreeUI()
-//        expandAllRows()
-        tree.expandRow(0)
-        tree.expandRow(1)
+
+        // Top: dropdown
+        add(comboBox, BorderLayout.NORTH)
+
+        // Center: scrollable tree
+        add(JScrollPane(tree), BorderLayout.CENTER)
+
+        // Set initial tree
+        updateTreeModel(featureList.first())
+
+        comboBox.addActionListener {
+            val selectedId = comboBox.selectedItem as? String ?: return@addActionListener
+            updateTreeModel(selectedId)
+        }
+    }
+
+    private fun updateTreeModel(featurePath: String) {
+        val selected = selectorGraph.features.find { it.projectPath == featurePath } ?: return
+        val rootNode = selected.toTreeNode()
+        tree.model = DefaultTreeModel(rootNode)
+        expandAllRows()
     }
 
     private fun expandAllRows() {

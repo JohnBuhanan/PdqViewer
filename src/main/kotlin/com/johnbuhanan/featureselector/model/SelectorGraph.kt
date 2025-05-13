@@ -11,6 +11,8 @@ class SelectorGraph(
 
     val rootNode: SelectorNode = projectGraph.rootNode.toSelectorNode()!!
 
+    val features: List<SelectorNode> by lazy { projectGraph.features.map { it.toSelectorNode()!! } }
+
     private fun ProjectNode.toSelectorNode(): SelectorNode? {
         val selectorNode = projectPath.toSelectorNode()
 
