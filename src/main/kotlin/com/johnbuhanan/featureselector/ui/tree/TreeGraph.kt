@@ -9,8 +9,6 @@ class TreeGraph(projectGraph: ProjectGraph) {
     val selectorGraph = SelectorGraph(projectGraph)
     val allGraphNodes = mutableMapOf<String, DefaultMutableTreeNode>()
 
-    val rootNode: DefaultMutableTreeNode = selectorGraph.rootNode.toTreeNode()
-
     private fun SelectorNode.toTreeNode(): DefaultMutableTreeNode {
         val treeNode = allGraphNodes.getOrPut(projectPath) {
             DefaultMutableTreeNode(this)

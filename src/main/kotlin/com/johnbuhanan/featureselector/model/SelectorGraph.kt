@@ -9,8 +9,6 @@ class SelectorGraph(
 
     val allSelectorNodes: MutableMap<String, SelectorNode> = mutableMapOf()
 
-    val rootNode: SelectorNode = projectGraph.rootNode.toSelectorNode()!!
-
     val features: List<SelectorNode> by lazy { projectGraph.features.map { it.toSelectorNode()!! } }
 
     private fun ProjectNode.toSelectorNode(): SelectorNode? {
